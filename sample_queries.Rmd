@@ -1,0 +1,70 @@
+---
+title: "Data Analysis And Data Modeling"
+author: "Pavan Akula"
+output:
+  prettydoc::html_pretty:
+    highlight: github
+    theme: leonids
+    toc: yes
+  pdf_document: default
+  html_document: default
+---
+
+```{r, echo=T}
+library(RMySQL)
+library(knitr)
+```
+
+```{r, echo=T}
+#Create MySQL Connection
+dbHandle <- dbConnect(MySQL(), user="root", pwd = "", database = "model1", host="localhost", port=3306)
+age.data <- dbReadTable(dbHandle, "model1.age")
+question.data <- dbReadTable(dbHandle, "model1.question")
+answer.data <- dbReadTable(dbHandle, "model1.answer")
+age.fact.data <- dbReadTable(dbHandle, "model1.age_fact")
+
+kable(question.data, align="l", row.names = NA)
+kable(answer.data,align="l", row.names = NA)
+kable(age.data, align="l", row.names = NA)
+kable(age.fact.data, align="l", row.names = NA)
+
+#Sample queries
+query <- "SELECT ageDesc,response_count,response_percentage FROM model1.age A JOIN  model1.age_fact B ON A.idAge = B.idAge WHERE B.idQuestion = 1"
+rs <- dbSendQuery(dbHandle, query)
+
+join.tables.data = fetch(rs, n=-1)
+
+kable(join.tables.data, align="l", row.names = NA)
+
+dbClose <- dbDisconnect(dbHandle)
+dbHandle <- NULL
+dbClose <- NULL
+```
+
+```{r, echo=T}
+dbHandle <- dbConnect(MySQL(), user="root", pwd = "", database = "model2", host="localhost", port=3306)
+section.data <- dbReadTable(dbHandle, "model2.section")
+category.data <- dbReadTable(dbHandle, "model2.category")
+question.data <- dbReadTable(dbHandle, "model2.question")
+answer.data <- dbReadTable(dbHandle, "model2.answer")
+survey.fact.data <- dbReadTable(dbHandle, "model2.survey_fact")
+
+kable(question.data, align="l", row.names = NA)
+kable(answer.data,align="l", row.names = NA)
+kable(section.data, align="l", row.names = NA)
+kable(category.data, align="l", row.names = NA)
+kable(survey.fact.data, align="l", row.names = NA)
+
+#Sample queries
+query <- "SELECT sectionDesc,response_count,response_percentage FROM model2.section A JOIN model2.survey_fact B ON A.idSection = B.idSection WHERE B.idQuestion = 1 AND idCategory = 3"
+
+rs <- dbSendQuery(dbHandle, query)
+
+join.tables.data = fetch(rs, n=-1)
+
+kable(join.tables.data, align="l", row.names = NA)
+
+dbClose <- dbDisconnect(dbHandle)
+dbHandle <- NULL
+dbClose <- NULL
+```
